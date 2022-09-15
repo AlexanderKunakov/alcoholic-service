@@ -1,0 +1,56 @@
+image: openjdk:17.0.2-slim
+
+stages:
+  - test
+  - build-app
+  - build-image
+
+test:
+  stage: test
+  script:
+    - chmod +x gradlew
+    - ./gradlew test
+  cache:
+    paths:
+      - ./.gradle
+      - ./order/build
+  tags:
+    - java
+  only:
+    - main
+
+build-mr:
+  stage: build-app
+  script:
+    - chmod +x gradlew
+    - ./gradlew build --no-daemon
+  tags:
+    - java
+  only:
+    - merge_requests
+
+build-app:
+  stage: build-app
+  script:
+    - chmod +x gradlew
+    - ./gradlew build --no-daemon
+  tags:
+    - java
+  artifacts:
+    paths:
+      - ./app/build/libs/*.jar
+    expire_in: 1 hour
+  only:
+    - main
+
+build-image:
+  tags:
+    - java
+  stage: build-image
+  image: docker:20.10.17-git
+  script:
+    - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
+    - docker build -t $CI_REGISTRY_IMAGE:$CI_PIPELINE_IID .
+    - docker push $CI_REGISTRY_IMAGE:$CI_PIPELINE_IID
+  only:
+    - main
