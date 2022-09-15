@@ -13,7 +13,8 @@ test:
   cache:
     paths:
       - ./.gradle
-      - ./order/build
+      - ./gradle
+      - ./build
   tags:
     - java
   only:
@@ -33,12 +34,12 @@ build-app:
   stage: build-app
   script:
     - chmod +x gradlew
-    - ./gradlew build --no-daemon
+    - ./gradlew build --no-daemon -x test
   tags:
     - java
   artifacts:
     paths:
-      - ./app/build/libs/*.jar
+      - ./build/libs/*.jar
     expire_in: 1 hour
   only:
     - main
