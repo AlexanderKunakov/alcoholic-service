@@ -23,7 +23,7 @@ import ru.buhinder.alcoholicservice.service.TokenService
 import javax.validation.Valid
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/alcoholic")
 class AuthController(
     private val authService: AuthService,
     private val tokenService: TokenService,

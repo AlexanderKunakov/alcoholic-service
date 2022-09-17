@@ -21,6 +21,13 @@ class SecurityConfig {
 
     companion object {
         const val jwtMatcher = "/api/alcoholic/**"
+        const val image = "/api/alcoholic/image/**"
+        val auth = arrayOf(
+            "/api/alcoholic/refresh",
+            "/api/alcoholic/register",
+            "/api/alcoholic/logout",
+            "/api/alcoholic/login",
+        )
     }
 
     @Bean
@@ -41,8 +48,8 @@ class SecurityConfig {
 
             .authorizeExchange()
             .pathMatchers(HttpMethod.OPTIONS).permitAll()
-            .pathMatchers("/api/refresh", "/api/register", "/api/logout", "/api/login").permitAll()
-            .pathMatchers("/api/alcoholic/image/**").permitAll()
+            .pathMatchers(*auth).permitAll()
+            .pathMatchers(image).permitAll()
 
             .and()
 
