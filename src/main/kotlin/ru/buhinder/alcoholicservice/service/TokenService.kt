@@ -102,7 +102,7 @@ class TokenService(
     fun createRefreshTokenCookie(refreshToken: String): ResponseCookie {
         return ResponseCookie.fromClientResponse("refreshToken", refreshToken)
             .httpOnly(true)
-            .path("/api/refresh")
+            .path("/api/alcoholic/refresh")
             .sameSite("Strict")
             .maxAge(refreshTokenDuration)
             .build()
