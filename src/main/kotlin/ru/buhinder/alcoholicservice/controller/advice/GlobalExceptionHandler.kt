@@ -49,6 +49,8 @@ class GlobalExceptionHandler {
 
     @ExceptionHandler(ServerWebInputException::class)
     fun handleWebInputException(exception: ServerWebInputException): ResponseEntity<ErrorInfoDto> {
+        logger.error("Got error: ", exception)
+
         val apiErrorDto = ErrorInfoDto(
             code = VALIDATION_ERROR,
             message = exception.cause?.message,

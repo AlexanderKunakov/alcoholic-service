@@ -3,6 +3,7 @@ package ru.buhinder.alcoholicservice.service
 import io.minio.GetObjectArgs
 import io.minio.MinioAsyncClient
 import io.minio.PutObjectArgs
+import io.minio.RemoveObjectArgs
 import java.io.SequenceInputStream
 import java.util.UUID
 import org.springframework.core.io.buffer.DataBuffer
@@ -24,7 +25,7 @@ class ImageService(
     private val minioProperties: MinioProperties,
 ) {
 
-    fun saveAlcoholicImage(image: FilePart): Mono<UUID> {
+    fun saveImage(image: FilePart): Mono<UUID> {
         return image.toMono()
             .flatMapMany { it.content() }
             .map { it.asInputStream(true) }
@@ -32,6 +33,24 @@ class ImageService(
             .map {
                 PutObjectArgs.builder()
                     .`object`("${UUID.randomUUID()}")
+                    .bucket(minioProperties.bucket)
+                    .contentType(IMAGE_JPEG_VALUE)
+                    .userMetadata(mapOf(minioProperties.file.name to image.filename()))
+                    .stream(it, -1, minioProperties.file.part)
+                    .build()
+            }
+            .flatMap { Mono.fromFuture(minioAsyncClient.putObject(it)) }
+            .map { it.`object`().toUUID() }
+    }
+
+    fun updateImage(imageId: UUID, image: FilePart): Mono<UUID> {
+        return image.toMono()
+            .flatMapMany { it.content() }
+            .map { it.asInputStream(true) }
+            .reduce(::SequenceInputStream)
+            .map {
+                PutObjectArgs.builder()
+                    .`object`("$imageId")
                     .bucket(minioProperties.bucket)
                     .contentType(IMAGE_JPEG_VALUE)
                     .userMetadata(mapOf(minioProperties.file.name to image.filename()))
@@ -60,4 +79,14 @@ class ImageService(
             }
     }
 
+    fun deleteImage(imageId: UUID): Mono<Void> {
+        return Mono.fromFuture(
+            minioAsyncClient.removeObject(
+                RemoveObjectArgs.builder()
+                    .bucket(minioProperties.bucket)
+                    .`object`("$imageId")
+                    .build()
+            )
+        ).then()
+    }
 }

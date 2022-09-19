@@ -5,6 +5,10 @@ import com.auth0.jwt.JWTVerifier
 import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.interfaces.Claim
 import com.auth0.jwt.interfaces.DecodedJWT
+import java.time.Duration
+import java.time.Instant
+import java.util.Date
+import java.util.UUID
 import org.springframework.http.ResponseCookie
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.stereotype.Service
@@ -19,10 +23,6 @@ import ru.buhinder.alcoholicservice.model.JwtContextModel
 import ru.buhinder.alcoholicservice.repository.AlcoholicDaoFacade
 import ru.buhinder.alcoholicservice.repository.SessionToRefreshDaoFacade
 import ru.buhinder.alcoholicservice.service.validation.SessionValidationService
-import java.time.Duration
-import java.time.Instant
-import java.util.Date
-import java.util.UUID
 
 @Service
 class TokenService(

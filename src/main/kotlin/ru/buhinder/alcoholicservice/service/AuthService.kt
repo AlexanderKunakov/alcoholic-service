@@ -1,5 +1,6 @@
 package ru.buhinder.alcoholicservice.service
 
+import java.util.UUID
 import org.springframework.core.convert.ConversionService
 import org.springframework.http.codec.multipart.FilePart
 import org.springframework.stereotype.Service
@@ -24,7 +25,6 @@ import ru.buhinder.alcoholicservice.service.factory.AlcoholicEntityFactory
 import ru.buhinder.alcoholicservice.service.validation.ImageValidationService
 import ru.buhinder.alcoholicservice.service.validation.RegistrationValidationService
 import ru.buhinder.alcoholicservice.service.validation.SessionValidationService
-import java.util.UUID
 
 @Service
 class AuthService(
@@ -52,14 +52,11 @@ class AuthService(
             .flatMap { tuple ->
                 image.toMono()
                     .flatMap { imageValidationService.validateImageFormat(it) }
-                    .flatMap { imageService.saveAlcoholicImage(it) }
+                    .flatMap { imageService.saveImage(it) }
                     .map { AlcoholicEntityFactory.createAlcoholicEntity(tuple.t1, tuple.t2, it) }
                     .switchIfEmpty(
-                        AlcoholicEntityFactory.createAlcoholicEntity(
-                            tuple.t1,
-                            tuple.t2,
-                            null
-                        ).toMono()
+                        AlcoholicEntityFactory.createAlcoholicEntity(tuple.t1, tuple.t2, null)
+                            .toMono()
                     )
             }
             .flatMap { entity -> alcoholicDaoFacade.insert(entity) }

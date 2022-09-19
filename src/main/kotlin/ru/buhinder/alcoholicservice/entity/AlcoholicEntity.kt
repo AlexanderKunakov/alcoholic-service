@@ -13,5 +13,5 @@ data class AlcoholicEntity(
     val login: String,
     val password: String,
     val email: String,
-    var photoId: UUID? = null
+    val photoId: UUID? = null
 )
