@@ -4,6 +4,7 @@ stages:
   - test
   - build-app
   - build-image
+  - deploy
 
 test:
   stage: test
@@ -54,4 +55,18 @@ build-image:
     - docker build -t $CI_REGISTRY_IMAGE:$CI_PIPELINE_IID .
     - docker push $CI_REGISTRY_IMAGE:$CI_PIPELINE_IID
   only:
+    - main
+
+kuber-dev:
+  stage: deploy
+  trigger:
+    project: buhinder/alco-env
+    branch: main
+  variables:
+    APPLICATION_BRANCH: $CI_COMMIT_REF_NAME
+    APPLICATION_VERSION: $CI_PIPELINE_IID
+    SERVICE_NAME: $CI_PROJECT_NAME
+  allow_failure: true
+  only:
+    - dev
     - main
